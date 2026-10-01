@@ -69,6 +69,12 @@ export function parseSourcesFromJson(jsonString: string): ImportResult {
     // Handle different JSON structures
     if (Array.isArray(data)) {
         sourcesArray = data;
+    } else if (data.settings && Array.isArray(data.settings.sources)) {
+        // Settings-export format: { settings: { sources: [...], premiumSources: [...] } }
+        sourcesArray = [
+            ...data.settings.sources,
+            ...(Array.isArray(data.settings.premiumSources) ? data.settings.premiumSources : []),
+        ];
     } else if (data.sources && Array.isArray(data.sources)) {
         sourcesArray = data.sources;
     } else if (data.list && Array.isArray(data.list)) {

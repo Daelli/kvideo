@@ -3,7 +3,7 @@
  */
 
 import type { VideoSource, SourceSubscription } from '@/lib/types';
-import { DEFAULT_SOURCES } from '@/lib/api/default-sources';
+import { DEFAULT_SOURCES, DEFAULT_SUBSCRIPTIONS } from '@/lib/api/default-sources';
 import { PREMIUM_SOURCES } from '@/lib/api/premium-sources';
 import { createSubscription } from '@/lib/utils/source-import-utils';
 
@@ -83,7 +83,11 @@ export const getDefaultPremiumSources = (): VideoSource[] => PREMIUM_SOURCES;
 
 function getEnvSubscriptions(customValue?: string): SourceSubscription[] {
   const envValue = (customValue || process.env.SUBSCRIPTION_SOURCES || process.env.NEXT_PUBLIC_SUBSCRIPTION_SOURCES || '').trim();
-  if (!envValue) return [];
+  if (!envValue) {
+    return DEFAULT_SUBSCRIPTIONS
+      .filter(s => s && typeof s.name === 'string' && typeof s.url === 'string')
+      .map(s => createSubscription(s.name, s.url));
+  }
 
   // 1. Try JSON
   try {
